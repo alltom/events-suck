@@ -19,6 +19,6 @@ function downloadPuppies(callback) {
 }
 
 downloadPuppies(function (puppies) {
-	// why do we never get here?
+	// why do the puppies never get here?
 	alert('There are ' + puppies.length + ' puppies!');
 });
