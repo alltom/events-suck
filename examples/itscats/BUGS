@@ -1,0 +1,2 @@
+- sometimes images get stuck (they don't disappear when parts of the page are invalidated)
+- when images fail to load, the spinner never goes away
