@@ -72,20 +72,6 @@ var makeGrid = function (rows, cols) {
 };
 
 var fill = function (row, col, rows, cols) {
-  var maxWidth = function (r, c) {
-    for (var i = c; i < cols; i++) {
-      if (grid[r][i]) return i - c;
-    }
-    return cols - c;
-  };
-
-  var maxHeight = function (r, c) {
-    for (var i = r; i < rows; i++) {
-      if (grid[i][c]) return i - r;
-    }
-    return rows - r;
-  };
-
   var occupy = function (r, c, rs, cs, val) {
     for (var i = r; i < r + rs; i++) {
       for (var j = c; j < c + cs; j++) {
@@ -94,16 +80,47 @@ var fill = function (row, col, rows, cols) {
     }
   };
 
+  var feasible = function (r, c, rs, cs) {
+    if (r + rs > gridRows || c + cs > gridCols) {
+      return false;
+    }
+    for (var i = r; i < r + rs; i++) {
+      for (var j = c; j < c + cs; j++) {
+        if (grid[i][j]) {
+          return false;
+        }
+      }
+    }
+    return true;
+  };
+
   for (var r = 0; r < rows; r++) {
     for (var c = 0; c < cols; c++) {
-      var mw = maxWidth(r, c),
-          mh = maxHeight(r, c);
-      if (mw == 0 || mh == 0) continue;
-
-      var w = Math.floor(1 + Math.random() * mw),
-          h = Math.floor(1 + Math.random() * mh);
-
-      occupy(r, c, h, w, place(r, c, h, w));
+      if (!grid[r][c]) {
+        var rs = 1, cs = 1;
+        var rdone = false, cdone = false;
+        while (true) {
+          if (!rdone && Math.random() < 0.5) {
+            if (feasible(r, c, rs + 1, cs)) {
+              rs++;
+            } else {
+              rdone = true;
+            }
+          } else {
+            if (feasible(r, c, rs, cs + 1)) {
+              cs++;
+            } else {
+              cdone = true;
+            }
+          }
+          if (rdone && cdone) {
+            break;
+          }
+        }
+        rs = Math.floor(1 + Math.random() * rs);
+        cs = Math.floor(1 + Math.random() * cs);
+        occupy(r, c, rs, cs, place(r, c, rs, cs));
+      }
     }
   }
 };
@@ -138,14 +155,16 @@ var refresh = function () {
     // flash(0, 0, gridRows, gridCols);
     wipeOut(0, 0, gridRows, gridCols);
   } else {
-    var r1 = Math.floor(Math.random() * gridRows);
-    var r2 = Math.floor(Math.random() * gridRows);
-    var c1 = Math.floor(Math.random() * gridCols);
-    var c2 = Math.floor(Math.random() * gridCols);
+    var r1 = Math.floor(Math.random() * (gridRows + 1));
+    var r2 = Math.floor(Math.random() * (gridRows + 1));
+    var c1 = Math.floor(Math.random() * (gridCols + 1));
+    var c2 = Math.floor(Math.random() * (gridCols + 1));
     if (r2 < r1) { var tmp = r1; r1 = r2; r2 = tmp; }
     if (c2 < c1) { var tmp = c1; c1 = c2; c2 = tmp; }
-    flash(r1, c1, r2 - r1, c2 - c1);
-    wipeOut(r1, c1, r2 - r1, c2 - c1);
+    if (r1 != r2 && c1 != c2) {
+      flash(r1, c1, r2 - r1, c2 - c1);
+      wipeOut(r1, c1, r2 - r1, c2 - c1);
+    }
   }
   wipeCount++;
 
