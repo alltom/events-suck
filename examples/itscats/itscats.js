@@ -175,9 +175,6 @@ var refresh = function () {
   }, 1000);
 };
 
-setInterval(refresh, 5000);
-$(window).resize(_.debounce(init, 300));
-
 var init = function () {
   catvas.empty();
   gridRows = Math.floor(($(window).innerHeight() - catvas.offset().top) / cellSize),
@@ -187,3 +184,6 @@ var init = function () {
 };
 
 init();
+
+setInterval(refresh, 5000);
+$(window).resize(_.debounce(init, 300));
