@@ -1,6 +1,12 @@
-# Stuck Images
+When I wrote the itscats example, I unintentionally added some bugs. Here are the ones I've noticed and how I found and fixed them.
+
+# Bug 1: Stuck Images
 
 Sometimes images get 'stuck' and don't disappear when they're supposed to. It looks like they stick around forever, hiding beneath images that get loaded on top of them.
+
+* Bug present in: dd6595cce57b0cee7b670e881139b1838b65c8b5
+* Bug fixed in: a2f0bd2ebd39dc6f08a3629fee2f50475275f346
+* Bug-inspired refactor (Cat and CatPlanner objects): b602ffdc7e83c04c7163e86d85b4fd7688ad55ff
 
 ## Debugging
 
@@ -52,6 +58,6 @@ I inspected the code but nothing stood out. I added a reference count to the img
 **Bug found:** when placing an image, I would determine the largest possible width and height by scanning rightward from the starting point, then downward from the starting point, then pick a random width and height within that range. That would sometimes generate a rectangle which overlapped with another rectangle, if that rectangle didn't exist on the same row or column as the starting point. I fixed the algorithm and the problem no longer seems to occur.
 
 
-# Image 404s & Endless Spinner
+# Bug 2: Image 404s & Endless Spinner
 
 When an image fails to load, the spinner never goes away. imagesLoading doesn't appear to decrement when those images fail to load, so I assume the load even isn't firing for them.
