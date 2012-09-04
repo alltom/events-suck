@@ -1,64 +1,11 @@
 <!doctype html>
+<html>
+<head>
 <title>Company Directory</title>
 
-<!-- BUG: if you delete the name while a search is running, the search never finishes -->
-<!-- BUG: if you type "vi", then "vic" and "vi" before the first search finishes, you get the results twice -->
-
-<!-- <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script> -->
 <script src="jquery-1.7.js?prebug=no"></script>
-<script>
-var resultsDiv;
-var spinnerDiv;
-var people = ["Amy Tobin", "Anthony Boling", "Olga Laine", "Harold Averett", "Melody Pettiford", "Vanessa Holloway", "Georgia Alfaro", "Jenny Hooper", "Sally Durden", "Jonathan Eubank", "Russell Owensby", "Michele Oconner", "Martin Overby", "Annie Slagle", "Gladys Sievers", "Dennis Deane", "Sue Simmons", "Joshua Montelongo", "Eva Bundy", "Craig Wargo", "Stanley Chaney", "Edward Ruhl", "Vickie Davison", "Hoggard", "Lillian Bigler", "Phillip Haynes", "Brandon Gilpin", "Renee Rodas", "Deborah Baxley", "Brandon Grissom", "Janie Twyman", "Gary Flack", "Phyllis Olmstead", "Curtis Farrington", "Charles Bowser", "Carl Robert", "Howard Elwell", "Ryan Hafner", "Arthur Budde", "Manuel Heywood", "Josephine Ardoin", "Cynthia Graham", "Thaxton", "Alicia Neilson", "Sharon Makowski", "Jack Mcnally", "Gwendolyn Richards", "Ryan Geter", "Peter Basile", "Lawrence Willingham", "Paula Lyons", "Antonio Earle", "Philip Sistrunk", "Edward Burkholder", "Helms", "Doris Brazil", "Elsie Blanchard", "Vicki Ko", "Antoinette Jett", "Larry Kirkwood"];
-
-people.sort();
-
-function search(term, callback) {
-	setTimeout(function () {
-		var results = [];
-		for (var i in people) {
-			if (people[i].toLowerCase().indexOf(term.toLowerCase()) !== -1) {
-				results.push(people[i]);
-			}
-		}
-		callback(results);
-	}, Math.random() * 3000+500);
-}
-
-function hideSpinner() {
-    spinnerDiv.hide();
-}
-
-var term = "";
-function keyPressed() {
-	if ($(this).val() !== term) {
-		var thisTerm = term = $(this).val();
-
-		if (term.length > 0) {
-			spinnerDiv.show();
-			resultsDiv.empty();
-			search(term, function (results) {
-				if (term === thisTerm) {
-					hideSpinner();
-					for (var i in results) {
-						$("<li />").appendTo(resultsDiv).text(results[i]);
-					}
-				}
-			});
-		} else {
-			resultsDiv.empty();
-		}
-	}
-}
-
-$(function () {
-	$("body").append("Search: ");
-	var textbox = $("<input />").appendTo("body");
-	textbox.on('keyup', keyPressed);
-	textbox.focus();
-
-	spinnerDiv = $("<div />").appendTo("body").html("Loading&#8230;").hide();
-
-	resultsDiv = $("<div />").appendTo("body");
-});
-</script>
+<script src="name-directory.js"></script>
+</head>
+<body>
+</body>
+</html>
