@@ -1,0 +1,71 @@
+<!doctype html>
+<title>Shopping Cart</title>
+<style>
+
+div.item {
+	width: 10em;
+	height: 2.4em;
+	background: #e0f0ff;
+	border: 1px solid #add7ff;
+	border-radius: 4px;
+	padding: 0.7em;
+	margin: 1em;
+	line-height: 1.2em;
+	cursor: move;
+}
+
+div.item.in-basket {
+	cursor: auto;
+}
+
+div.basket {
+	position: absolute;
+	top: 0;
+	left: 15em;
+	width: 20em;
+	min-height: 7.2em;
+	background: #fff1e0;
+	padding: 0.7em;
+	margin: 1em;
+	line-height: 1.2em;
+}
+
+div.basket.hover {
+	background: #ffd9ad;
+}
+
+</style>
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/jquery-ui.min.js"></script>
+<script>
+var items = ["The DaVinci Code", "The Lorax on Blu-Ray", "Television", "Toaster", "Coconut Water", "Hulk Action Figure", "Red Shirt", "Treadmill", "Muffler"];
+var basketItems = [];
+
+function displayItem(name) {
+	var item = $("<div class='item' />").appendTo("body").text(name);
+	item.draggable({
+		appendTo: "body",
+		helper: "clone"
+	});
+}
+
+function displayBasket() {
+	var basket = $("<div class='basket' />").appendTo("body");
+	basket.droppable({
+		hoverClass: "hover",
+		accept: ":not(.in-basket)",
+		drop: function (event, ui) {
+			var clone = ui.draggable.clone();
+			clone.appendTo(this).toggleClass("in-basket");
+		}
+	});
+}
+
+$(function () {
+	for (var i in items) {
+		displayItem(items[i]);
+	}
+	displayBasket();
+});
+</script>
