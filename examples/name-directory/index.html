@@ -19,7 +19,9 @@
     var searchUrl = "http://joelrocks.corp.adobe.com:3000/search";
     
     var search = function (term, callback) {
-        $.getJSON(searchUrl, {s: term}, callback);
+        $.getJSON(searchUrl, {s: term}, function () {
+            callback.apply(this, arguments);
+        });
     };
     
     var hideSpinner = function () {
