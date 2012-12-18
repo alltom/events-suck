@@ -1,0 +1,80 @@
+<!--
+You want to show a list of friends with the number of photos they have,
+but getting a friend's photos is a separate AJAX call, so you have to update
+the page asynchronously for each friend.
+
+Unfortunately, one of your friends has disallowed access to their photos, so
+HTTP 403 is returned and the success callback for that friend is not called.
+
+In this version, we wait until information about all friends is loaded before
+displaying anything.
+  Symptom: friends list never populates
+-->
+
+<script src="jquery.js"></script>
+<script>
+// stubbed getJSON that returns no photo data for the friend with ID == 2
+function getJSON(url, success) {
+	setTimeout(function () {
+		if (/friends$/.test(url)) {
+			success([
+				{ id: 1, name: "Joe" },
+				{ id: 2, name: "Susan" },
+				{ id: 3, name: "Adrienne" },
+			]);
+		} else if (/photos$/.test(url)) {
+			var id = /([0-9]+)\/photos$/.exec(url)[1];
+			if (id == 2) {
+				// don't respond
+			} else {
+				success([{ id: 1 }, { id: 2 }, { id: 3 }]);
+			}
+		}
+	}, Math.random());
+}
+
+function getFriends(callback) {
+	getJSON("http://api.example.com/friends", function (friends) {
+		callback(friends);
+	});
+}
+
+function getPhotoCount(friend, callback) {
+	getJSON("http://api.example.com/friends/" + friend.id + "/photos", function (photos) {
+		callback(photos.length);
+	});
+}
+
+function showFriend(friend) {
+	var li = $("<li />");
+	li.append($("<span class='name'></span>").text(friend.name));
+	li.append(" ");
+	li.append($("<span class='num-photos'></span>").text("(" + friend.photoCount + " photos)")); // bug 2: here too
+	$("#friends").append(li);
+}
+
+function showFriends(friends) {
+	friends.forEach(function (friend) {
+		showFriend(friend);
+	});
+}
+
+$(function () {
+	getFriends(function (friends) {
+		var numFriends = friends.length;
+		var friendsLoaded = 0;
+		friends.forEach(function (friend) {
+			getPhotoCount(friend, function (photoCount) {
+				friend.photoCount = photoCount; // bug 1: forgot to add photoCount to friend - showed "(undefined photos)" (if all friends loaded)
+				friendsLoaded++;
+				if (friendsLoaded === numFriends) {
+					showFriends(friends);
+				}
+			});
+		});
+	});
+});
+</script>
+
+<h2>Friends</h2>
+<ul id="friends"></ul>

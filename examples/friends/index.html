@@ -1,0 +1,62 @@
+<!--
+You want to show a list of friends with the number of photos they have,
+but getting a friend's photos is a separate AJAX call, so you have to update
+the page asynchronously for each friend.
+
+Unfortunately, one of your friends has disallowed access to their photos, so
+HTTP 403 is returned and the success callback for that friend is not called.
+
+In this version, we add each friend to the page immediately, and update it with
+the number of photos as that information arrives.
+  Symptom: not all friends have photo counts
+-->
+
+<script src="jquery.js"></script>
+<script>
+// stubbed getJSON that returns no photo data for the friend with ID == 2
+function getJSON(url, success) {
+	setTimeout(function () {
+		if (/friends$/.test(url)) { // bug 1: text() instead of test() - exception
+			success([
+				{ id: 1, name: "Joe" },
+				{ id: 2, name: "Susan" },
+				{ id: 3, name: "Adrienne" },
+			]);
+		} else if (/photos$/.test(url)) {
+			var id = /([0-9]+)\/photos$/.exec(url)[1];
+			if (id == 2) {
+				// don't respond
+			} else {
+				success([{ id: 1 }, { id: 2 }, { id: 3 }]);
+			}
+		}
+	}, Math.random());
+}
+
+function showFriends() {
+	getJSON("http://api.example.com/friends", function (friends) {
+		friends.forEach(function (friend) {
+			var li = $("<li />");
+			li.append($("<span class='name'></span>").text(friend.name)); // bug 5: used li.append().text() instead of li.append($().text()) - displayed the same, but had incorrect HTML
+			li.append(" ");
+			li.append("<span class='num-photos'></span>");
+			$("#friends").append(li);
+			showPhotoCount(friend, li); // bug 2: showFriendCount() instead of showPhotoCount() - exception
+		});
+	});
+}
+
+function showPhotoCount(friend, li) {
+	getJSON("http://api.example.com/friends/" + friend.id + "/photos", function (photos) {
+		li.find(".num-photos").text("(" + photos.length + " photos)");
+	});
+}
+
+// bug 4: wasn't wrapped in $(), so page not necessarily loaded - list empty, $("#friends").size() == 0
+$(function () {
+	showFriends();
+});
+</script>
+
+<h2>Friends</h2>
+<ul id="friends"></ul> <!-- bug 3: id was "#friends" instead of "friends" - nothing appeared on page, printed $("#friends").size(), tried wrapping showFriends(); in $() -->

@@ -1,0 +1,81 @@
+<!--
+You want to show a list of friends with the number of photos they have,
+but getting a friend's photos is a separate AJAX call, so you have to update
+the page asynchronously for each friend.
+
+Unfortunately, one of your friends has disallowed access to their photos, so
+HTTP 403 is returned and the success callback for that friend is not called.
+
+In this version, we add each friend to the page only after we have their photos.
+  Symptom: not all friends appear
+-->
+
+<script src="jquery.js"></script>
+<script>
+// stubbed getJSON that returns no photo data for the friend with ID == 2
+function getJSON(url, success) {
+	setTimeout(function () {
+		if (/friends$/.test(url)) {
+			success([
+				{ id: 1, name: "Joe" },
+				{ id: 2, name: "Susan" },
+				{ id: 3, name: "Adrienne" },
+			]);
+		} else if (/photos$/.test(url)) {
+			var id = /([0-9]+)\/photos$/.exec(url)[1];
+			if (id == 2) {
+				// don't respond
+			} else {
+				success([{ id: 1 }, { id: 2 }, { id: 3 }]);
+			}
+		}
+	}, Math.random());
+}
+
+function getFriends(callback) {
+	getJSON("http://api.example.com/friends", function (friends) {
+		callback(friends);
+	});
+}
+
+function getPhotoCount(friend, callback) {
+	getJSON("http://api.example.com/friends/" + friend.id + "/photos", function (photos) {
+		callback(photos.length);
+	});
+}
+
+function showFriend(friend, photoCount) {
+	var li = $("<li />");
+	li.append($("<span class='name'></span>").text(friend.name)); // bug 2: used li.append().text() instead of li.append($().text()) - displayed the same, but had incorrect HTML
+	li.append(" ");
+	li.append($("<span class='num-photos'></span>").text("(" + photoCount + " photos)")); // bug 2: here too
+	$("#friends").append(li);
+}
+
+$(function () {
+	getFriends(function (friends) {
+		console.log("got friends");
+		friends.forEach(function (friend) {
+			console.log("got friend", friend);
+			getPhotoCount(friend, function (photoCount) { // bug 1: used getPhotoCount() but function was still called showPhotoCount() - exception
+				console.log("got photos for", friend, photoCount);
+				showFriend(friend, photoCount);
+			});
+		});
+	});
+});
+
+/*
+ console output:
+
+ got friends
+ got friend Object {id: 1, name: "Joe"}
+ got friend Object {id: 2, name: "Susan"}
+ got friend Object {id: 3, name: "Adrienne"}
+ got photos for Object {id: 1, name: "Joe"} 3
+ got photos for Object {id: 3, name: "Adrienne"} 3
+ */
+</script>
+
+<h2>Friends</h2>
+<ul id="friends"></ul>
