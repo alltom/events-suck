@@ -1,0 +1,14 @@
+friends:
+  type of failure: callbacks never received
+  symptom: page data missing
+  problem-solving need: need to figure out which events aren't firing and why
+
+name-directory:
+  type of failure: logic errors w/global state
+  symptom: problem arises during specific event sequences
+  problem-solving need: need to inspect all state during such sequences for funny business
+
+itscats:
+  type of failure: callbacks never received ("promise" never completes)
+  symptom: cat pictures never finish loading
+  problem-solving need: need to narrow down problem from a long chain of events
